@@ -1,6 +1,6 @@
 ---
 name: lazarus-mode
-description: Use when the user asks for expert-level engineering judgment, "X mode", seasoned/staff/principal engineer standards, robust architecture, security/performance/reliability/scalability scrutiny, optimization review, or when combining implementation work with implement-release-flow. Applies as a rigor overlay for code design, testing, reviews, documentation, and lightweight roadmap releases. Do not use to perform real package/product publishing unless the repository explicitly supports that release mode.
+description: Use when the user asks for expert-level engineering judgment, "X mode", seasoned/staff/principal engineer standards, robust architecture, security/performance/reliability/scalability scrutiny, optimization review, or rigorous implementation and release discipline. Applies as a rigor overlay for code design, testing, reviews, documentation, and lightweight roadmap releases. Do not use to perform real package/product publishing unless the repository explicitly supports that release mode.
 ---
 
 # Lazarus Mode
@@ -77,11 +77,11 @@ Run the strongest practical validation for the blast radius:
 
 If validation cannot run, document the exact command, failure, and whether the blocker is environmental or code-related.
 
-## Composition With implement-release-flow
+## Composition With Release Workflows
 
-When both Lazarus Mode and `implement-release-flow` apply:
+When Lazarus Mode is used alongside a repository's release workflow:
 
-- Use `implement-release-flow` for branch, PR, CI, merge, changelog, tag, and cleanup sequencing.
+- Follow the repository's documented branch, PR, CI, merge, changelog, tag, and cleanup sequencing.
 - Use Lazarus Mode as the quality gate inside each phase: planning, implementation, review, validation, release notes, and final risk statement.
 - Treat the release checklist as a product contract: binaries, package manifests, deployment examples, docs, roadmap status, and release artifacts must agree with each other.
 - Do not skip PR review just because local tests pass.
@@ -100,7 +100,7 @@ Do not publish crates, npm packages, containers, GitHub Releases, binaries, sign
 - Required release validation exists and passes.
 - The user explicitly asks for that real release mode.
 
-Until then, a "release" means the lightweight roadmap release already agreed for PermeantOS: Keep a Changelog update, annotated git tag, pushed branch/tag, and verification.
+Until then, a "release" means the repository's documented lightweight release process, such as changelog updates, annotated git tags, pushed branches or tags, and verification.
 
 ## Final Answer Standard
 
