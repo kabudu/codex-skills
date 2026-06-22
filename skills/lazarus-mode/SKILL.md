@@ -1,0 +1,113 @@
+---
+name: lazarus-mode
+description: Use when the user asks for expert-level engineering judgment, "X mode", seasoned/staff/principal engineer standards, robust architecture, security/performance/reliability/scalability scrutiny, optimization review, or when combining implementation work with implement-release-flow. Applies as a rigor overlay for code design, testing, reviews, documentation, and lightweight roadmap releases. Do not use to perform real package/product publishing unless the repository explicitly supports that release mode.
+---
+
+# Lazarus Mode
+
+## Purpose
+
+Lazarus Mode is an expert-engineering rigor overlay. Use it to make implementation decisions as if the work will be reviewed by a principal engineer responsible for correctness, operability, security, performance, maintainability, and long-term product direction.
+
+This is not a license to overbuild. The output should be more correct, better bounded, better tested, and easier to evolve.
+
+## Operating Rules
+
+- Start from the repository's actual architecture, docs, tests, release process, and current maturity.
+- Treat ambiguous roadmap wording as a design problem: define the concrete acceptance criteria before editing.
+- Build a requirement inventory before implementation. Extract every explicit user request, roadmap bullet, checklist item, linked doc requirement, release-process expectation, and "where relevant" documentation/update obligation into a working checklist. Do not collapse separate deliverables into a broad label.
+- Do not mark an item complete because a scaffold, placeholder, TODO, starter template, or documentation-only note exists. Count it complete only when it is usable by the intended operator/developer in the repository's release context, or explicitly mark it as a documented limitation accepted by the user.
+- Prefer doing the difficult-but-bounded work over narrowing the requirement to the easy subset. If a requirement is feasible within the current repo and requested release scope, implement it; if it is not feasible, state the blocker before merge/release and leave the item unchecked or documented as deferred.
+- Prefer narrow, production-shaped increments over broad speculative abstractions.
+- Identify failure modes before choosing the implementation: rollback, partial writes, stale state, concurrency, unbounded work, timeouts, resource exhaustion, compatibility, security, data loss, privacy, and user-visible behavior.
+- Treat performance and scalability as correctness constraints for production paths: avoid unbounded fan-out, serial network loops, startup blockers, runaway retries, excessive memory growth, and hidden latency cliffs.
+- Make public or protocol-facing changes explicit in docs, tests, changelog, and compatibility notes.
+- Use existing local conventions unless they are actively blocking correctness.
+- Do not hide prototype limitations. Document them precisely and name the future production requirement.
+
+## Implementation Standard
+
+Before editing, inspect the relevant modules and tests. For each non-trivial change, decide:
+
+- **Invariant:** What must always remain true?
+- **Boundary:** Which component owns the behavior?
+- **Failure path:** What happens on rejection, timeout, partial failure, or bad input?
+- **Performance path:** What is the expected work per request/job, what bounds concurrency/time/memory, and what happens as inputs or providers scale?
+- **Compatibility:** What existing users, fixtures, or scripts must keep working?
+- **Evidence:** What tests or smoke checks prove the behavior?
+
+Implementation should be scoped, but not superficial. If the smallest change would create a misleading or unsafe behavior, widen the scope enough to fix the actual boundary.
+
+## Completion Gate
+
+Before claiming completion, merging, or releasing, perform a requirement-by-requirement audit:
+
+1. Re-read the user's latest request, roadmap text, project instructions, and changed docs.
+2. For every requirement, record one of: implemented and verified; implemented but unverified with reason; deferred with explicit user acceptance; or not done.
+3. Search for placeholder markers and incomplete language in touched release surfaces: `TODO`, `FIXME`, `REPLACE_WITH`, `placeholder`, `starter`, `template`, `future`, `not implemented`, and unchecked checklist boxes.
+4. Verify packaging, deployment, and documentation claims against actual files and release artifacts. A package manifest with placeholder checksums, a manifest requiring a nonexistent image, or docs without backing behavior is not complete.
+5. Update roadmap/checklist state only after the implementation and validation evidence support it.
+
+If any item is not done, do not describe the whole roadmap item as shipped. Report the exact gap and either fix it before release or keep it explicitly deferred.
+
+## Review Standard
+
+Run a self-review before merge using this order:
+
+1. Correctness and data/state consistency.
+2. Performance and scalability: bounded concurrency, timeouts, caching, backpressure, startup/readiness impact, resource growth, and worst-case behavior.
+3. Security, secrets, privacy, and replay/side-effect risk.
+4. Protocol/API compatibility and versioning impact.
+5. Failure behavior, rollback, idempotency, and cleanup.
+6. Test coverage against behavior, not only implementation details.
+7. Documentation and changelog accuracy.
+8. Accidental generated files, local artifacts, or unrelated diffs.
+
+Material findings must be fixed before merge unless explicitly documented as accepted limitations.
+
+## Validation Standard
+
+Run the strongest practical validation for the blast radius:
+
+- Focused unit tests for changed logic.
+- Integration/smoke tests for transaction, protocol, runtime, or release behavior.
+- Performance-shaped tests or checks for changed background jobs, discovery/probing loops, retry paths, caches, queues, streaming paths, and other potentially unbounded or latency-sensitive work.
+- Full test suites when the change touches shared protocol, CLI, schema, or release surfaces.
+- CI must pass before merge when a PR workflow exists.
+
+If validation cannot run, document the exact command, failure, and whether the blocker is environmental or code-related.
+
+## Composition With implement-release-flow
+
+When both Lazarus Mode and `implement-release-flow` apply:
+
+- Use `implement-release-flow` for branch, PR, CI, merge, changelog, tag, and cleanup sequencing.
+- Use Lazarus Mode as the quality gate inside each phase: planning, implementation, review, validation, release notes, and final risk statement.
+- Treat the release checklist as a product contract: binaries, package manifests, deployment examples, docs, roadmap status, and release artifacts must agree with each other.
+- Do not skip PR review just because local tests pass.
+- Do not merge until CI is green unless the user explicitly accepts a documented exception.
+- During release, perform the repository's current lightweight release only: changelog promotion, annotated git tag, push, and verification.
+
+## Real Release Exception
+
+Real product/package releases are intentionally deferred until the project has explicit release infrastructure.
+
+Do not publish crates, npm packages, containers, GitHub Releases, binaries, signed artifacts, package registry versions, or production deployments unless all are true:
+
+- The repository documents that release mode.
+- Versioning and artifact ownership are clear.
+- Credentials/secrets are configured through the intended secure path.
+- Required release validation exists and passes.
+- The user explicitly asks for that real release mode.
+
+Until then, a "release" means the lightweight roadmap release already agreed for PermeantOS: Keep a Changelog update, annotated git tag, pushed branch/tag, and verification.
+
+## Final Answer Standard
+
+Report only the highest-signal facts:
+
+- What changed.
+- PR/merge/release identifiers when relevant.
+- Validation performed.
+- Material limitations or risks.
+- Cleanup state.
